@@ -21,10 +21,6 @@ namespace StudentDetails.Models
                 SqlParameter passPara =  cmd.Parameters.Add("@val2",SqlDbType.VarChar,100);
                 passPara.Value = user.Password;
 
-                /***cmd.Parameters.AddWithValue("@val1", SqlDbType.VarChar);
-                
-                cmd.Parameters.AddWithValue("@val2", SqlDbType.VarChar); ***/
-
                 con.Open();
                 cmd.Prepare();
         

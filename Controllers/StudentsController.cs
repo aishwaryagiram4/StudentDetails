@@ -7,25 +7,28 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using StudentDetails.Models;
 
+
 namespace StudentDetails.Controllers
 {
     public class StudentsController : Controller
     {
-        private readonly StudentDBContext _context;
+        //ADO.NET
+       StudentsDataAccess studentsDataAccess = new StudentsDataAccess();
+       // StudentsDataAccess2 studentsDataAccess;
 
         public StudentsController(StudentDBContext context)
         {
-            _context = context;
+            //studentsDataAccess = new StudentsDataAccess2(context);
         }
 
         // GET: Students
-        public async Task<IActionResult> Index()
+        public  IActionResult Index()
         {
-            return View(await _context.Students.ToListAsync());
+            return View(studentsDataAccess.Students());
         }
 
         // GET: Students/Details/5
-        public async Task<IActionResult> Details(long? id)
+       /* public async Task<IActionResult> Details(long? id)
         {
             if (id == null)
             {
@@ -40,10 +43,10 @@ namespace StudentDetails.Controllers
             }
 
             return View(students);
-        }
+        }*/
 
         // GET: Students/Create
-        public IActionResult Create()
+        /*public IActionResult Create()
         {
             return View();
         }
@@ -62,10 +65,10 @@ namespace StudentDetails.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(students);
-        }
+        }*/
 
         // GET: Students/Edit/5
-        public async Task<IActionResult> Edit(long? id)
+       /* public async Task<IActionResult> Edit(long? id)
         {
             if (id == null)
             {
@@ -78,12 +81,12 @@ namespace StudentDetails.Controllers
                 return NotFound();
             }
             return View(students);
-        }
+        }*/
 
         // POST: Students/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+       /* [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, [Bind("StudId,Name,Address,DeptName,Marks,CratedDate")] Students students)
         {
@@ -131,22 +134,85 @@ namespace StudentDetails.Controllers
             }
 
             return View(students);
+        }*/
+
+        [HttpGet]
+         public IActionResult Create()
+        {
+            return View();
         }
 
-        // POST: Students/Delete/5
+        [HttpPost]
+        public ActionResult Create(Students stud)
+        {
+            studentsDataAccess.AddStudents(stud);
+            return RedirectToAction("Index");
+        }
+        public IActionResult Edit(int? id)
+        {
+            
+            Students students = studentsDataAccess.GetStudentData(id);
+            
+            return View(students);
+        }
+       
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int id, [Bind]Students students)
+        {
+                studentsDataAccess.UpdateStudents(students);
+                return RedirectToAction("Index");
+         }
+        public IActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            Students students = studentsDataAccess.GetStudentData(id);
+            if (students == null)
+            {
+                return NotFound();
+            }
+            return View(students);
+        }
+        public IActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            Students students = studentsDataAccess.GetStudentData(id);
+
+            if (students == null)
+            {
+                return NotFound();
+            }
+            return View(students);
+        }
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(long id)
+        public IActionResult DeleteConfirmed(int? id)
         {
-            var students = await _context.Students.FindAsync(id);
-            _context.Students.Remove(students);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            studentsDataAccess.DeleteStudents(id);
+            return RedirectToAction("Index");
         }
 
-        private bool StudentsExists(long id)
-        {
-            return _context.Students.Any(e => e.StudId == id);
-        }
+
+
+
+
+
+        // POST: Students/Delete/5
+        /*  [HttpPost, ActionName("Delete")]
+          [ValidateAntiForgeryToken]
+          public async Task<IActionResult> DeleteConfirmed(long id)
+          {
+              var students = await _context.Students.FindAsync(id);
+              _context.Students.Remove(students);
+              await _context.SaveChangesAsync();
+              return RedirectToAction(nameof(Index));
+          }*/
+
     }
 }
