@@ -2,13 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 namespace StudentDetails.Models
 {
-    public class StudentsDataAccess
+    public class StudentsDataAccess : IStudentsDataAccess
     {
         string connectionString = "Server=FSIND-LT-16\\SQLEXPRESS;Database=StudentDB;Trusted_Connection=True;";
 
@@ -19,16 +16,15 @@ namespace StudentDetails.Models
             cmd.CommandType = CommandType.StoredProcedure;
 
             cmd.Parameters.AddWithValue("@Name", stud.Name);
-            cmd.Parameters.AddWithValue("@Address",stud.Address);
+            cmd.Parameters.AddWithValue("@Address", stud.Address);
             cmd.Parameters.AddWithValue("@DeptName", stud.DeptName);
             cmd.Parameters.AddWithValue("@Marks", stud.Marks);
             con.Open();
             cmd.ExecuteNonQuery();
             cmd.Dispose();
             con.Close();
-            
-        }
 
+        }
         public IEnumerable<Students> Students()
         {
             List<Students> students = new List<Students>();
@@ -46,7 +42,7 @@ namespace StudentDetails.Models
                     Students stud = new Students();
 
                     stud.StudId = Convert.ToInt32(rdr["StudId"]);
-                   stud.Name = rdr["Name"].ToString();
+                    stud.Name = rdr["Name"].ToString();
                     stud.Address = rdr["Address"].ToString();
                     stud.DeptName = rdr["DeptName"].ToString();
                     stud.CratedDate = Convert.ToDateTime(rdr["CratedDate"].ToString());
@@ -61,23 +57,24 @@ namespace StudentDetails.Models
         }
         public void UpdateStudents(Students stud)
         {
-                Debug.WriteLine(stud.StudId + stud.Name + stud.Address + stud.DeptName + stud.Marks);
+            Debug.WriteLine(stud.StudId + stud.Name + stud.Address + stud.DeptName + stud.Marks);
 
-                using SqlConnection con = new SqlConnection(connectionString);
-                SqlCommand cmd = new SqlCommand("spUpdateStudents", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+            using SqlConnection con = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand("spUpdateStudents", con);
+            cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@StudId", stud.StudId);
-                cmd.Parameters.AddWithValue("@Name", stud.Name);
-                cmd.Parameters.AddWithValue("@Address", stud.Address);
-                cmd.Parameters.AddWithValue("@DeptName", stud.DeptName);
-                cmd.Parameters.AddWithValue("@Marks", stud.Marks);
+            cmd.Parameters.AddWithValue("@StudId", stud.StudId);
+            cmd.Parameters.AddWithValue("@Name", stud.Name);
+            cmd.Parameters.AddWithValue("@Address", stud.Address);
+            cmd.Parameters.AddWithValue("@DeptName", stud.DeptName);
+            cmd.Parameters.AddWithValue("@Marks", stud.Marks);
 
-                con.Open();
-                cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                con.Close();
-            
+            con.Open();
+            cmd.ExecuteNonQuery();
+            cmd.Dispose();
+            con.Close();
+
+
         }
         public Students GetStudentData(int? id)
         {
@@ -97,7 +94,7 @@ namespace StudentDetails.Models
                     students.Name = rdr["Name"].ToString();
                     students.Address = rdr["Address"].ToString();
                     students.DeptName = rdr["DeptName"].ToString();
-                    students.Marks = Convert.ToDecimal(rdr["Marks"]);           
+                    students.Marks = Convert.ToDecimal(rdr["Marks"]);
                 }
             }
             return students;

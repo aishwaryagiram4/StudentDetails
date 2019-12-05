@@ -1,30 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+
 using Microsoft.EntityFrameworkCore;
 using StudentDetails.Models;
+using AutoMapper;
+using MediatR;
+
 
 namespace StudentDetails.Controllers
 {
     public class LoginTablesController : Controller
     {
         private readonly StudentDBContext _context;
+        private readonly IMediator _mediator;
 
-        public LoginTablesController(StudentDBContext context)
+        public LoginTablesController(StudentDBContext context, IMediator mediator)
         {
             _context = context;
+            _mediator = mediator;
         }
 
+
+
         // GET: LoginTables
+      
         public async Task<IActionResult> Index()
         {
             return View(await _context.LoginTable.ToListAsync());
         }
 
         // GET: LoginTables/Details/5
+       
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -43,29 +51,39 @@ namespace StudentDetails.Controllers
         }
 
         // GET: LoginTables/Create
+       
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: LoginTables/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+     
         public async Task<IActionResult> Create([Bind("EmailId,Password")] LoginTable loginTable)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(loginTable);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("LoginTable", "Home");
-            }
-            return View(loginTable);
-        }
+         {
+             if (ModelState.IsValid)
+             {
+                 LoginTable myUser = _context.LoginTable.SingleOrDefault(user => user.EmailId == loginTable.EmailId);
+                 if (myUser == null)
+                 {
+                     _context.Add(loginTable);
+                     await _context.SaveChangesAsync();
+                     return RedirectToAction("LoginTable", "Home");
+                 }
+                 else
+                 {
+                     ViewData["Error"] = "User Already Exists.";
+                     return View();
+                 }
+             }
+             return View(loginTable);
 
-        // GET: LoginTables/Edit/5
-        public async Task<IActionResult> Edit(string id)
+         }
+    
+
+            // GET: LoginTables/Edit/5
+            public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
             {
@@ -85,6 +103,7 @@ namespace StudentDetails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        
         public async Task<IActionResult> Edit(string id, [Bind("EmailId,Password")] LoginTable loginTable)
         {
             if (id != loginTable.EmailId)
@@ -116,6 +135,7 @@ namespace StudentDetails.Controllers
         }
 
         // GET: LoginTables/Delete/5
+        
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -136,6 +156,7 @@ namespace StudentDetails.Controllers
         // POST: LoginTables/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+       
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var loginTable = await _context.LoginTable.FindAsync(id);
@@ -143,6 +164,7 @@ namespace StudentDetails.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+       
 
         private bool LoginTableExists(string id)
         {

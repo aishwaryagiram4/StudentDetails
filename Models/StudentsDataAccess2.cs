@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace StudentDetails.Models
 {
-    public class StudentsDataAccess2
+    public class StudentsDataAccess2 : IStudentsDataAccess
     {
         StudentDBContext studentDBContext;
 

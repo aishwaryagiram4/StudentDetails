@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace StudentDetails.Models
 {
@@ -8,6 +6,7 @@ namespace StudentDetails.Models
     {
         [Required]
         public string EmailId { get; set; }
+
         [Required]
         [Display(Name = "Password")]
         [DataType(DataType.Password)]

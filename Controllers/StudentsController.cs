@@ -1,218 +1,107 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using StudentDetails.Models;
-
-
+using StudentDetails.Models.Infrastructure;
 namespace StudentDetails.Controllers
+
 {
     public class StudentsController : Controller
     {
-        //ADO.NET
-       StudentsDataAccess studentsDataAccess = new StudentsDataAccess();
-       // StudentsDataAccess2 studentsDataAccess;
+        private readonly IMediator _mediator;
+        IStudentsDataAccess studentsDataAccess;
+        private readonly IMapper _mapper;
 
-        public StudentsController(StudentDBContext context)
+        public StudentsController(IStudentsDataAccess _studentsDataAccess, IMediator mediator,IMapper mapper)
         {
-            //studentsDataAccess = new StudentsDataAccess2(context);
+            studentsDataAccess = _studentsDataAccess;
+            _mediator = mediator;
+            _mapper = mapper;
+
         }
 
         // GET: Students
+        [Authorize]
         public  IActionResult Index()
         {
-            return View(studentsDataAccess.Students());
+             return View(studentsDataAccess.Students());
+
+           
         }
-
-        // GET: Students/Details/5
-       /* public async Task<IActionResult> Details(long? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var students = await _context.Students
-                .FirstOrDefaultAsync(m => m.StudId == id);
-            if (students == null)
-            {
-                return NotFound();
-            }
-
-            return View(students);
-        }*/
-
-        // GET: Students/Create
-        /*public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Students/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("StudId,Name,Address,DeptName,Marks,CratedDate")] Students students)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(students);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(students);
-        }*/
-
-        // GET: Students/Edit/5
-       /* public async Task<IActionResult> Edit(long? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var students = await _context.Students.FindAsync(id);
-            if (students == null)
-            {
-                return NotFound();
-            }
-            return View(students);
-        }*/
-
-        // POST: Students/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-       /* [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("StudId,Name,Address,DeptName,Marks,CratedDate")] Students students)
-        {
-            if (id != students.StudId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(students);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!StudentsExists(students.StudId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(students);
-        }
-
-        // GET: Students/Delete/5
-        public async Task<IActionResult> Delete(long? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var students = await _context.Students
-                .FirstOrDefaultAsync(m => m.StudId == id);
-            if (students == null)
-            {
-                return NotFound();
-            }
-
-            return View(students);
-        }*/
-
         [HttpGet]
-         public IActionResult Create()
+        [Authorize]
+        public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
-        public ActionResult Create(Students stud)
+        [Authorize]
+        public ActionResult Create(AddStudentsRequestModel stud)
         {
-            studentsDataAccess.AddStudents(stud);
-            return RedirectToAction("Index");
+    
+            if (ModelState.IsValid)
+            {
+                _mediator.Send(stud);
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return View(stud);  
+            }
         }
+        [Authorize]
         public IActionResult Edit(int? id)
         {
-            
-            Students students = studentsDataAccess.GetStudentData(id);
-            
-            return View(students);
+           var stud = _mediator.Send(new GetStudentDataRequestModel { StudId = id });
+           return View(_mapper.Map<EditStudentsRequestModel>(stud.Result));
         }
+
        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, [Bind]Students students)
+        [Authorize]
+        public ActionResult Edit(EditStudentsRequestModel students)
         {
-                studentsDataAccess.UpdateStudents(students);
-                return RedirectToAction("Index");
-         }
+           _mediator.Send(students);
+            return RedirectToAction("Index");
+        }
+        [Authorize]
         public IActionResult Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-            Students students = studentsDataAccess.GetStudentData(id);
-            if (students == null)
-            {
-                return NotFound();
-            }
-            return View(students);
+            return View(_mediator.Send(new GetStudentDataRequestModel { StudId = id}).Result);
         }
+        [Authorize]
         public IActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            Students students = studentsDataAccess.GetStudentData(id);
-
-            if (students == null)
-            {
-                return NotFound();
-            }
-            return View(students);
-        }
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+         {
+            return View();
+         }
+         [HttpPost, ActionName("Delete")]
+         [ValidateAntiForgeryToken]
+        [Authorize]
         public IActionResult DeleteConfirmed(int? id)
         {
-            studentsDataAccess.DeleteStudents(id);
-            return RedirectToAction("Index");
+           _mediator.Send(new DeleteStudentDataRequestModel { StudId = id });
+           return RedirectToAction("index");
         }
 
 
+        [Authorize]
+       [Route("Logout")]
+      public IActionResult Logout()
+        {
+            HttpContext.Session.Remove("EmailId");
+            return RedirectToAction("Index", "Home");
+        }
+    
 
 
 
 
-        // POST: Students/Delete/5
-        /*  [HttpPost, ActionName("Delete")]
-          [ValidateAntiForgeryToken]
-          public async Task<IActionResult> DeleteConfirmed(long id)
-          {
-              var students = await _context.Students.FindAsync(id);
-              _context.Students.Remove(students);
-              await _context.SaveChangesAsync();
-              return RedirectToAction(nameof(Index));
-          }*/
 
     }
 }

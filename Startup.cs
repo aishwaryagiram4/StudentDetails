@@ -1,13 +1,14 @@
+using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using StudentDetails.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace StudentDetails
 {
@@ -17,6 +18,7 @@ namespace StudentDetails
         {
             Configuration = configuration;
         }
+        
 
         public IConfiguration Configuration { get; }
 
@@ -25,8 +27,30 @@ namespace StudentDetails
         {
             var connection = Configuration.GetConnectionString("StudentDB");
             services.AddDbContext<Models.StudentDBContext>(options => options.UseSqlServer(connection));
-
+            
             services.AddControllersWithViews();
+          
+            //Mediator
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+            
+            //Mapper
+          var mappingConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new Mapping());
+            });
+
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
+
+            services.AddTransient<IStudentsDataAccess,StudentsDataAccess2>();
+
+            //Session
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(60);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +67,7 @@ namespace StudentDetails
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseSession();
 
             app.UseAuthorization();
 
@@ -52,6 +77,10 @@ namespace StudentDetails
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+            /*The endpoint route resolution is the concept of looking at the
+             * incoming request and mapping the request to an endpoint using 
+             * route mappings*/
+
         }
     }
 }
