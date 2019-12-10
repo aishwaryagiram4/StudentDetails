@@ -16,7 +16,7 @@ namespace StudentDetails.Models
     public class ResponseModelResult
     {
         public bool Success { get; set; }
-        public string ResponseText { get; set; }
+       // public string ResponseText { get; set; }
     }
     internal class LoginHandler : IRequestHandler<RequestModel, ResponseModelResult>
     {
@@ -26,15 +26,12 @@ namespace StudentDetails.Models
         }
         public async Task<ResponseModelResult> Handle(RequestModel request, CancellationToken cancellationToken)
         {
-            
-
-
             DataAccess dataAccess = new DataAccess();
-             LoginTable user = new LoginTable();
-             user.EmailId = request.Email;
-             user.Password = request.Password;
-             bool success = dataAccess.CheckLogin(user);
-             return new ResponseModelResult() { Success = success, ResponseText = "Login Successfull" };
+            LoginTable user = new LoginTable();
+            user.EmailId = request.Email;
+            user.Password = request.Password;
+            bool success = dataAccess.CheckLogin(user);
+            return new ResponseModelResult() { Success = success };
         }
     }
 }

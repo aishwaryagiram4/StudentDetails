@@ -28,13 +28,14 @@ namespace StudentDetails
             var connection = Configuration.GetConnectionString("StudentDB");
             services.AddDbContext<Models.StudentDBContext>(options => options.UseSqlServer(connection));
             
+            //MVC layer Dependency Injection
             services.AddControllersWithViews();
           
             //Mediator
             services.AddMediatR(Assembly.GetExecutingAssembly());
             
             //Mapper
-          var mappingConfig = new MapperConfiguration(cfg =>
+           var mappingConfig = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new Mapping());
             });
@@ -51,6 +52,9 @@ namespace StudentDetails
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
+            /*
+              When you set a cookie with the HttpOnly flag, it informs the browser that
+              this special cookie should only be accessed by the server*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

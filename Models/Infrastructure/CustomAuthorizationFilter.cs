@@ -10,7 +10,7 @@ namespace StudentDetails.Models.Infrastructure
 {
     public class CustomAuthorizationFilter : IAuthorizationFilter
     {
-
+        //to confirm request is autorized or not
         public void OnAuthorization(AuthorizationFilterContext context)
         {
 

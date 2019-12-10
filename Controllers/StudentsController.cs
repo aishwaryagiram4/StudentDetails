@@ -3,6 +3,9 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using StudentDetails.Models;
 using StudentDetails.Models.Infrastructure;
+using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace StudentDetails.Controllers
 
 {
@@ -78,8 +81,9 @@ namespace StudentDetails.Controllers
         [Authorize]
         public IActionResult Delete(int? id)
          {
-            return View();
-         }
+            var stud = _mediator.Send(new GetStudentDataRequestModel { StudId = id });
+            return View(_mapper.Map<Students>(stud.Result));
+        }
          [HttpPost, ActionName("Delete")]
          [ValidateAntiForgeryToken]
         [Authorize]
@@ -89,6 +93,8 @@ namespace StudentDetails.Controllers
            return RedirectToAction("index");
         }
 
+        
+
 
         [Authorize]
        [Route("Logout")]
@@ -97,11 +103,7 @@ namespace StudentDetails.Controllers
             HttpContext.Session.Remove("EmailId");
             return RedirectToAction("Index", "Home");
         }
-    
 
-
-
-
-
+       
     }
 }

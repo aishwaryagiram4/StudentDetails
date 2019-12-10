@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-
 using Microsoft.EntityFrameworkCore;
 using StudentDetails.Models;
 using AutoMapper;
@@ -25,7 +24,7 @@ namespace StudentDetails.Controllers
 
 
         // GET: LoginTables
-      
+        //ToListAsync()=Creates a List<T> from an IQueryable by enumerating it asynchronously.
         public async Task<IActionResult> Index()
         {
             return View(await _context.LoginTable.ToListAsync());
@@ -39,9 +38,11 @@ namespace StudentDetails.Controllers
             {
                 return NotFound();
             }
-
+            
             var loginTable = await _context.LoginTable
                 .FirstOrDefaultAsync(m => m.EmailId == id);
+            //returns the first element of a sequence, 
+            //or a default value if the sequence contains no elements
             if (loginTable == null)
             {
                 return NotFound();
@@ -58,8 +59,8 @@ namespace StudentDetails.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-     
+        [ValidateAntiForgeryToken]// to check code is sent from the browser of a trusted user
+
         public async Task<IActionResult> Create([Bind("EmailId,Password")] LoginTable loginTable)
          {
              if (ModelState.IsValid)
@@ -98,9 +99,7 @@ namespace StudentDetails.Controllers
             return View(loginTable);
         }
 
-        // POST: LoginTables/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         
@@ -152,12 +151,13 @@ namespace StudentDetails.Controllers
 
             return View(loginTable);
         }
+        
 
         // POST: LoginTables/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
        
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             var loginTable = await _context.LoginTable.FindAsync(id);
             _context.LoginTable.Remove(loginTable);

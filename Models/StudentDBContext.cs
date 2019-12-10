@@ -18,11 +18,12 @@ namespace StudentDetails.Models
         public virtual DbSet<Students> Students { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
-             modelBuilder.Entity<LoginTable>(entity =>
+           
+            modelBuilder.Entity<LoginTable>(entity =>
             {
                 entity.HasKey(e => e.EmailId)
                     .HasName("PK__LoginTab__7ED91ACF3CC7C2A3");
+                //Configures the name of the index in the database
 
                 entity.Property(e => e.EmailId)
                     .HasMaxLength(100)
@@ -34,7 +35,7 @@ namespace StudentDetails.Models
                     .IsUnicode(false);
             });
 
-            
+          
 
 
             modelBuilder.Entity<Students>(entity =>
@@ -53,11 +54,15 @@ namespace StudentDetails.Models
                 entity.Property(e => e.DeptName)
                     .HasMaxLength(20)
                     .IsUnicode(false);
+              
 
-                entity.Property(e => e.Marks).HasColumnType("decimal(18, 0)");
+                entity.Property(e => e.Marks)
+                      .HasColumnType("decimal(18, 0)");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
+                    /*	Configures whether the valid value of the property is required or 
+                   whether the value is null*/
                     .HasMaxLength(100)
                     .IsUnicode(false);
             });

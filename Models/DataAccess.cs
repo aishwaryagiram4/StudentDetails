@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Data;
 
 namespace StudentDetails.Models
@@ -8,6 +9,14 @@ namespace StudentDetails.Models
         string connectionString = "Server=FSIND-LT-16\\SQLEXPRESS;Database=StudentDB;Trusted_Connection=True;";
         public bool CheckLogin(LoginTable user)
         {
+            if(string.IsNullOrEmpty(user.EmailId))
+            {
+                throw new ArgumentNullException(user.EmailId);
+            }
+            else if (string.IsNullOrEmpty(user.Password) || user.Password.Length < 8)
+            {
+                throw new ArgumentNullException(user.Password);
+            }
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                SqlCommand cmd = new SqlCommand("SELECT * FROM LoginTable WHERE EmailID=@val1 AND Password=@val2", con);

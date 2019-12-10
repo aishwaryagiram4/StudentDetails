@@ -9,7 +9,7 @@ namespace StudentDetails.Models
     {
         string connectionString = "Server=FSIND-LT-16\\SQLEXPRESS;Database=StudentDB;Trusted_Connection=True;";
 
-        public void AddStudents(Students stud)
+        public bool AddStudents(Students stud)
         {
             using SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand("spAddStudents", con);
@@ -23,6 +23,7 @@ namespace StudentDetails.Models
             cmd.ExecuteNonQuery();
             cmd.Dispose();
             con.Close();
+            return true;
 
         }
         public IEnumerable<Students> Students()

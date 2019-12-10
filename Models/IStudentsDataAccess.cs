@@ -4,7 +4,7 @@ namespace StudentDetails.Models
 {
     public interface IStudentsDataAccess
     {
-        void AddStudents(Students stud);
+        bool AddStudents(Students stud);
         void DeleteStudents(int? id);
         Students GetStudentData(int? id);
         IEnumerable<Students> Students();

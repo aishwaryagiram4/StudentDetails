@@ -44,7 +44,7 @@ namespace StudentDetails.Controllers
           if (success)
           {
                 HttpContext.Session.SetString("EmailId", user.EmailId);
-              return RedirectToAction("Index","Students");
+                return RedirectToAction("Index","Students");
           }
           else
           {
@@ -54,15 +54,13 @@ namespace StudentDetails.Controllers
          
         }
        public IActionResult InvalidSession()
-        {
+       {
             return View();
-        }
-
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+       }
+      [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
       public IActionResult Error()
       {
-          return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
       }
   }
 }
